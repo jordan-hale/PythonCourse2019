@@ -10,10 +10,11 @@ from bs4 import BeautifulSoup
 import urllib.request
 import csv
 import unicodedata
-
+#opens csv with the following columns
 with open('hw2_jordan.csv', 'w', encoding='utf-8') as f:
   w = csv.DictWriter(f, fieldnames = ("title", "date", "firstissue", "secondissue", "thirdissue", "signatures"))
   w.writeheader()
+#begins with the first page of petitions
   web_address1 = 'https://petitions.whitehouse.gov/petitions?page=1'
   petitions1 = {}
   web_page1 = urllib.request.urlopen(web_address1)
@@ -22,11 +23,15 @@ with open('hw2_jordan.csv', 'w', encoding='utf-8') as f:
   for j in all_petitions1:
       all_az1 = j.find_all('a')
       for az1 in all_az1:
+#navigates to each petition's url
           petitions_address1 = "https://petitions.whitehouse.gov/" + az1['href']
           petitions_page1 = urllib.request.urlopen(petitions_address1)
           petitions_html1 = BeautifulSoup(petitions_page1.read())
+#pulls the title
           petitions1['title'] = petitions_html1.find('h1').get_text()
+#pulls the date
           petitions1['date'] = petitions_html1.find('h4').get_text()[19:]
+#pulls the issues (up to 3)
           issues1 = petitions_html1.find('div', {'class' : 'field field-name-field-petition-issues field-type-taxonomy-term-reference field-label-hidden tags'})
           all_h61 = issues1.find_all('h6')
           petitions1['firstissue'] = unicodedata.normalize('NFKD', all_h61[0].get_text())
@@ -38,8 +43,11 @@ with open('hw2_jordan.csv', 'w', encoding='utf-8') as f:
               petitions1['thirdissue'] = unicodedata.normalize('NFKD', all_h61[2].get_text())
           except IndexError:
               petitions1['thirdissue'] = 'NA'
+#pulls the signatures
           petitions1['signatures'] = petitions_html1.find('span', {'class' : 'signatures-number'}).get_text()
+#fills in the csv
           w.writerow(petitions1)
+#repeats above process for page 2
   web_address2 = 'https://petitions.whitehouse.gov/petitions?page=2'
   petitions2 = {}
   web_page2 = urllib.request.urlopen(web_address2)
@@ -66,6 +74,7 @@ with open('hw2_jordan.csv', 'w', encoding='utf-8') as f:
               petitions2['thirdissue'] = 'NA'
           petitions2['signatures'] = petitions_html2.find('span', {'class' : 'signatures-number'}).get_text()
           w.writerow(petitions2)
+#repeats above process for page 3
   web_address3 = 'https://petitions.whitehouse.gov/petitions?page=3'
   petitions3 = {}
   web_page3 = urllib.request.urlopen(web_address3)
@@ -92,6 +101,7 @@ with open('hw2_jordan.csv', 'w', encoding='utf-8') as f:
               petitions3['thirdissue'] = 'NA'
           petitions3['signatures'] = petitions_html3.find('span', {'class' : 'signatures-number'}).get_text()
           w.writerow(petitions3)
+#repeats above process for page 4
   web_address4 = 'https://petitions.whitehouse.gov/petitions?page=4'
   petitions4 = {}
   web_page4 = urllib.request.urlopen(web_address4)
@@ -118,29 +128,3 @@ with open('hw2_jordan.csv', 'w', encoding='utf-8') as f:
               petitions4['thirdissue'] = 'NA'
           petitions4['signatures'] = petitions_html4.find('span', {'class' : 'signatures-number'}).get_text()
           w.writerow(petitions4)
-  web_address5 = 'https://petitions.whitehouse.gov/petitions?page=5'
-  petitions5 = {}
-  web_page5 = urllib.request.urlopen(web_address5)
-  all_html5 = BeautifulSoup(web_page5.read())
-  all_petitions5 = all_html5.find_all('h3')
-  for j in all_petitions5:
-      all_az5 = j.find_all('a')
-      for az5 in all_az5:
-          petitions_address5 = "https://petitions.whitehouse.gov/" + az5['href']
-          petitions_page5 = urllib.request.urlopen(petitions_address5)
-          petitions_html5 = BeautifulSoup(petitions_page5.read())
-          petitions5['title'] = petitions_html5.find('h1').get_text()
-          petitions5['date'] = petitions_html5.find('h4').get_text()[19:]
-          issues5 = petitions_html5.find('div', {'class' : 'field field-name-field-petition-issues field-type-taxonomy-term-reference field-label-hidden tags'})
-          all_h65 = issues5.find_all('h6')
-          petitions5['firstissue'] = unicodedata.normalize('NFKD', all_h65[0].get_text())
-          try:
-              petitions5['secondissue'] = unicodedata.normalize('NFKD', all_h65[1].get_text())
-          except IndexError:
-              petitions5['secondissue'] = 'NA'
-          try:
-              petitions5['thirdissue'] = unicodedata.normalize('NFKD', all_h65[2].get_text())
-          except IndexError:
-              petitions5['thirdissue'] = 'NA'
-          petitions5['signatures'] = petitions_html5.find('span', {'class' : 'signatures-number'}).get_text()
-          w.writerow(petitions5)
